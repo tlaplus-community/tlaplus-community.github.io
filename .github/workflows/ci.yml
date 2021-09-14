@@ -1,5 +1,8 @@
 name: Update TS TLA+ WASM
-on: workflow_dispatch
+on:
+  pull_request:
+    branches:
+      - test
 jobs:
   update-ts-tla-wasm:
     runs-on: ubuntu-latest
