@@ -27,6 +27,7 @@ jobs:
           else
             echo "WASM files differ; update necessary."
             cp $NPM_PATH $JS_PATH
+            git config user.name "github-runner"
             git add $JS_PATH
             git commit -m "Upgrade WASM to tree-sitter-tlaplus $PKG_VERSION"
             git push origin
