@@ -1,8 +1,7 @@
 name: Update TS TLA+ WASM
 on:
-  pull_request:
-    branches:
-      - main
+  schedule:
+    - cron: '30 5 * * *'
 jobs:
   update-ts-tla-wasm:
     runs-on: ubuntu-latest
