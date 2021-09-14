@@ -11,6 +11,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{secrets.GH_PAT}}
+          ref: test
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
@@ -28,7 +29,8 @@ jobs:
             echo "WASM files differ; update necessary."
             cp $NPM_PATH $JS_PATH
             git config user.name "github-runner"
+            git config user.email "info@github.com"
             git add $JS_PATH
             git commit -m "Upgrade WASM to tree-sitter-tlaplus $PKG_VERSION"
-            git push origin HEAD:test
+            git push origin
           fi
