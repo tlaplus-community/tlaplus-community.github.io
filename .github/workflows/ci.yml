@@ -2,7 +2,7 @@ name: Update TS TLA+ WASM
 on:
   pull_request:
     branches:
-      - test
+      - main
 jobs:
   update-ts-tla-wasm:
     runs-on: ubuntu-latest
