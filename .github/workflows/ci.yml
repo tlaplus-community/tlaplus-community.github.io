@@ -30,5 +30,5 @@ jobs:
             git config user.name "github-runner"
             git add $JS_PATH
             git commit -m "Upgrade WASM to tree-sitter-tlaplus $PKG_VERSION"
-            git push origin
+            git push origin HEAD:test
           fi
