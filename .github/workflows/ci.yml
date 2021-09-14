@@ -10,7 +10,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v2
         with:
-          token: ${{secrets.GITHUB_AUTH_TOKEN}}
+          token: ${{secrets.GH_PAT}}
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
