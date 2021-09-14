@@ -1,0 +1,30 @@
+name: Update TS TLA+ WASM
+on: workflow_dispatch
+jobs:
+  update-ts-tla-wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+        with:
+          token: ${{secrets.GITHUB_AUTH_TOKEN}}
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          registry-url: https://registry.npmjs.org/
+      - name: Check for WASM update
+        run: |
+          npm install @tlaplus/tree-sitter-tlaplus
+          PKG_VERSION=`npm view @tlaplus/tree-sitter-tlaplus version`
+          NPM_PATH="./node_modules/@tlaplus/tree-sitter-tlaplus/tree-sitter-tlaplus.wasm"
+          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter-tlaplus.wasm"
+          echo "Comparing $NPM_PATH with $JS_PATH"
+          if cmp --silent -- $NPM_PATH $JS_PATH; then
+            echo "WASM files are identical. No update necessary."
+          else
+            echo "WASM files differ; update necessary."
+            cp $NPM_PATH $JS_PATH
+            git add $JS_PATH
+            git commit -m "Upgrade WASM to tree-sitter-tlaplus $PKG_VERSION"
+            git push origin
+          fi
