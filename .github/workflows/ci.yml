@@ -1,5 +1,6 @@
 name: Update TS TLA+ WASM
 on:
+  workflow_dispatch:
   schedule:
     - cron: '30 5 * * *'
 jobs:
