@@ -15,20 +15,36 @@ jobs:
         uses: actions/setup-node@v2
         with:
           registry-url: https://registry.npmjs.org/
-      - name: Check for WASM update
+      - name: Check for updates
+        shell: bash
         run: |
-          npm install @tlaplus/tree-sitter-tlaplus
-          PKG_VERSION=`npm view @tlaplus/tree-sitter-tlaplus version`
+          npm install @tlaplus/tree-sitter-tlaplus web-tree-sitter
+
+          TLA_VERSION=`npm view @tlaplus/tree-sitter-tlaplus version`
+          TS_VERSION=`npm view web-tree-sitter version`
+
           NPM_PATH="./node_modules/@tlaplus/tree-sitter-tlaplus/tree-sitter-tlaplus.wasm"
           JS_PATH="./tree-sitter-tlaplus/js/tree-sitter-tlaplus.wasm"
-          echo "Comparing $NPM_PATH with $JS_PATH"
-          if cmp --silent -- $NPM_PATH $JS_PATH; then
-            echo "WASM files are identical. No update necessary."
-          else
-            echo "WASM files differ; update necessary."
-            cp $NPM_PATH $JS_PATH
+          cp $NPM_PATH $JS_PATH
+
+          NPM_PATH="./node_modules/web-tree-sitter/tree-sitter.wasm"
+          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter.wasm"
+          cp $NPM_PATH $JS_PATH
+
+          NPM_PATH="./node_modules/web-tree-sitter/tree-sitter.js"
+          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter.js"
+          cp $NPM_PATH $JS_PATH
+
+          NPM_PATH="./node_modules/web-tree-sitter/tree-sitter.js"
+          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter.js"
+
+          DIFF_COUNT=`git status --porcelain=v1 2>/dev/null | wc -l`
+          echo "Diff count: $DIFF_COUNT"
+          if [ "$DIFF_COUNT" -gt 0 ]; then
+            echo "Files differ; update necessary"
             git config user.name "github-runner"
-            git add $JS_PATH
-            git commit -m "Upgrade WASM to tree-sitter-tlaplus $PKG_VERSION"
+            git commit -am "Upgrade to tree-sitter-tlaplus $TLA_VERSION, web-tree-sitter $TS_VERSION"
             git push origin
+          else
+            echo "Files are identical. No update necessary."
           fi
