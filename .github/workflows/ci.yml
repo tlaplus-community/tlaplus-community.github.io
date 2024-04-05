@@ -1,8 +1,9 @@
 name: Upgrade Dependencies
 on:
   workflow_dispatch:
-  repository_dispatch:
-    types: [tree-sitter-tlaplus-release]
+  # Currently updating breaks everything so disabling this
+  #repository_dispatch:
+  #  types: [tree-sitter-tlaplus-release]
 jobs:
   update-ts-tla-wasm:
     name: Upgrade Dependencies
