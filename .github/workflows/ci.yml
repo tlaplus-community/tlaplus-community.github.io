@@ -1,51 +1,44 @@
-name: Update TS TLA+ WASM
+name: Upgrade Dependencies
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '30 5 * * *'
+  repository_dispatch:
+    types: [tree-sitter-tlaplus-release]
 jobs:
   update-ts-tla-wasm:
+    name: Upgrade Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{secrets.GH_PAT}}
-          ref: main
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          registry-url: https://registry.npmjs.org/
+      - name: Setup node.js
+        uses: actions/setup-node@v4
       - name: Check for updates
-        shell: bash
         run: |
-          npm install @tlaplus/tree-sitter-tlaplus web-tree-sitter
+          npm install web-tree-sitter
+          version=$(npm view web-tree-sitter version)
+          echo "web-tree-sitter version: $version"
 
-          TLA_VERSION=`npm view @tlaplus/tree-sitter-tlaplus version`
-          TS_VERSION=`npm view web-tree-sitter version`
+          package_path="./node_modules/web-tree-sitter/tree-sitter.wasm"
+          repo_path="./tree-sitter-tlaplus/js/tree-sitter.wasm"
+          cp "$package_path" "$repo_path"
 
-          NPM_PATH="./node_modules/@tlaplus/tree-sitter-tlaplus/tree-sitter-tlaplus.wasm"
-          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter-tlaplus.wasm"
-          cp $NPM_PATH $JS_PATH
+          package_path="./node_modules/web-tree-sitter/tree-sitter.js"
+          repo_path="./tree-sitter-tlaplus/js/tree-sitter.js"
+          cp "$package_path" "$repo_path"
 
-          NPM_PATH="./node_modules/web-tree-sitter/tree-sitter.wasm"
-          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter.wasm"
-          cp $NPM_PATH $JS_PATH
+          wget -nv "https://github.com/tlaplus-community/tree-sitter-tlaplus/releases/latest/download/tree-sitter-tlaplus.wasm" \
+                -O "./tree-sitter-tlaplus/js/tree-sitter-tlaplus.wasm"
 
-          NPM_PATH="./node_modules/web-tree-sitter/tree-sitter.js"
-          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter.js"
-          cp $NPM_PATH $JS_PATH
-
-          NPM_PATH="./node_modules/web-tree-sitter/tree-sitter.js"
-          JS_PATH="./tree-sitter-tlaplus/js/tree-sitter.js"
-
-          DIFF_COUNT=`git status --porcelain=v1 2>/dev/null | wc -l`
-          echo "Diff count: $DIFF_COUNT"
-          if [ "$DIFF_COUNT" -gt 0 ]; then
+          diff_count=$(git status --porcelain=v1 2>/dev/null | wc -l)
+          echo "Diff count: $diff_count"
+          if [ "$diff_count" -gt 0 ]; then
             echo "Files differ; update necessary"
             git config user.name "github-runner"
-            git commit -am "Upgrade to tree-sitter-tlaplus $TLA_VERSION, web-tree-sitter $TS_VERSION"
+            git commit -am "Upgrade tree-sitter-tlaplus WASM and/or web-tree-sitter $version"
             git push origin
           else
             echo "Files are identical. No update necessary."
           fi
+
