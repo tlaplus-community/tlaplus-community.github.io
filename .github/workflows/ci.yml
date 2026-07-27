@@ -8,11 +8,11 @@ jobs:
   update-ts-tla-wasm:
     name: Upgrade Dependencies
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Clone repo
         uses: actions/checkout@v4
-        with:
-          token: ${{secrets.GH_PAT}}
       - name: Setup node.js
         uses: actions/setup-node@v4
       - name: Check for updates
@@ -36,7 +36,8 @@ jobs:
           echo "Diff count: $diff_count"
           if [ "$diff_count" -gt 0 ]; then
             echo "Files differ; update necessary"
-            git config user.name "github-runner"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -am "Upgrade tree-sitter-tlaplus WASM and/or web-tree-sitter $version"
             git push origin
           else
