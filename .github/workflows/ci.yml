@@ -17,9 +17,7 @@ jobs:
         uses: actions/setup-node@v4
       - name: Check for updates
         run: |
-          npm install web-tree-sitter
-          version=$(npm view web-tree-sitter version)
-          echo "web-tree-sitter version: $version"
+          npm install web-tree-sitter@0.20.8
 
           package_path="./node_modules/web-tree-sitter/tree-sitter.wasm"
           repo_path="./tree-sitter-tlaplus/js/tree-sitter.wasm"
@@ -38,7 +36,7 @@ jobs:
             echo "Files differ; update necessary"
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -am "Upgrade tree-sitter-tlaplus WASM and/or web-tree-sitter $version"
+            git commit -am "Upgrade tree-sitter-tlaplus WASM"
             git push origin
           else
             echo "Files are identical. No update necessary."
